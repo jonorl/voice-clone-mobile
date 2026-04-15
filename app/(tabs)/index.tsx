@@ -17,7 +17,7 @@ import * as Sharing from 'expo-sharing';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { fetch } from 'expo/fetch';
-import { generateSpeech, checkSpace } from './gradioClient';
+import generateSpeech, {checkSpace } from './gradioClient';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Step = 'write' | 'tune' | 'listen';

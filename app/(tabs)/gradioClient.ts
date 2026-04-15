@@ -40,7 +40,7 @@ interface GenerateParams {
 }
 
 // ── Main generation call ──────────────────────────────────────────────────────
-export async function generateSpeech(
+export default async function generateSpeech(
   params: GenerateParams,
   token: string
 ): Promise<string> {
