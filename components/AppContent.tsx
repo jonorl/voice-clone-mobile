@@ -12,10 +12,9 @@ type Step = 'write' | 'tune' | 'listen';
 
 export default function AppContent() {
   const [step, setStep] = useState<Step>('write');
-
-  const { player } = useAudioPlayback();
-  const { spaceStatus } = useGenerateSpeech(
-    player,              
+  const { player, playing, togglePlayback } = useAudioPlayback();
+  const { generate, loading, audioUri, error, spaceStatus } = useGenerateSpeech(
+    player,
     () => setStep('listen')
   );
 
@@ -24,7 +23,16 @@ export default function AppContent() {
       <StatusBar barStyle="light-content" />
       <SafeAreaView style={[styles.root]}>
         <StatusPill spaceStatus={spaceStatus} />
-        <StepTabs />
+        <StepTabs
+          step={step}
+          setStep={setStep}
+          generate={generate}
+          loading={loading}
+          audioUri={audioUri}
+          error={error}
+          spaceStatus={spaceStatus}
+          playing={playing}
+          togglePlayback={togglePlayback} />
       </SafeAreaView>
     </GestureHandlerRootView>
   );

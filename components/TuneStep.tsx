@@ -75,7 +75,7 @@ export default function Tune({
             styles.primaryButtonDisabled,
           ]}
           disabled={!text.trim() || loading || spaceStatus !== 'ready'}
-          onPress={() => { handleGenerate }}
+          onPress={() => { () => handleGenerate }}
         >
           <Text style={styles.primaryButtonText}>
             {loading ? 'Generating…' : '✦  Generate with these params'}

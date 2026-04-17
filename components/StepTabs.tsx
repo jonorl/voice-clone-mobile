@@ -1,29 +1,42 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from '@/styles/shared'
-import useGenerateSpeech from '@/hooks/useGenerate';
-import useAudioPlayback from '@/hooks/useAudioPlayback';
 import * as Sharing from 'expo-sharing';
 import Write from './WriteStep';
 import Tune from './TuneStep';
 import Listen from './ListenStep';
 
 type Step = 'write' | 'tune' | 'listen';
+type SpaceStatus = 'checking' | 'ready' | 'sleeping' | 'error';
 
-export default function StepTabs() {
-  const [step, setStep] = useState<Step>('write');
+interface StepTabsProps {
+  step: Step;
+  setStep: (s: Step) => void;
+  generate: (params: { text: string; temperature: number; topK: number; topP: number; seed: number }) => void;
+  loading: boolean;
+  audioUri: string | null;
+  error: string;
+  spaceStatus: SpaceStatus;
+  playing: boolean;
+  togglePlayback: (uri: string | null) => void;
+}
+
+export default function StepTabs({
+  step,
+  setStep,
+  generate,
+  loading,
+  audioUri,
+  error,
+  spaceStatus,
+  playing,
+  togglePlayback,
+}: StepTabsProps) {
   const [text, setText] = useState('');
   const [temperature, setTemperature] = useState(0.7);
   const [topK, setTopK] = useState(50);
   const [topP, setTopP] = useState(0.85);
   const [seed, setSeed] = useState(42);
-
-  const { player, playing, togglePlayback } = useAudioPlayback();
-
-  const { generate, loading, audioUri, error, spaceStatus } = useGenerateSpeech(
-    player,
-    () => setStep('listen')
-  );
 
   const handleGenerate = () => {
     generate({ text, temperature, topK, topP, seed });
@@ -73,7 +86,7 @@ export default function StepTabs() {
           setTemperature={setTemperature}
           topK={topK}
           setTopK={setTopK}
-          topP={topK}
+          topP={topP}
           setTopP={setTopP}
           seed={seed}
           setSeed={setSeed}
