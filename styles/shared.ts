@@ -67,14 +67,11 @@ export const styles = StyleSheet.create({
   },
   chipsRow: { marginBottom: 24 },
   chip: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    marginRight: 10,
-    maxWidth: 200,
+    width: '48%',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: '#1e1e2e',
   },
   chipText: { color: colors.text, fontSize: 12, lineHeight: 17 },
   primaryButton: {
@@ -132,3 +129,4 @@ export const styles = StyleSheet.create({
   shareButtonText: { color: colors.accent, fontWeight: '600' },
   hintText: { color: colors.muted, fontSize: 13, textAlign: 'center', marginTop: 20 },
 });
+

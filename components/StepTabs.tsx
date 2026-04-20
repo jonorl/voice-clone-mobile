@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from '@/styles/shared'
 import * as Sharing from 'expo-sharing';

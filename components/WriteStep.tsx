@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity } from 'react-native';
 import { styles } from '@/styles/shared'
 import { EXAMPLES } from '@/constants/examples';
@@ -20,38 +20,22 @@ export default function Write({
   spaceStatus,
   error
 }: WriteProps) {
+
+  const placeholder = useMemo(
+    () => EXAMPLES[Math.floor(Math.random() * EXAMPLES.length)],
+    []
+  );
   return (
     <>
-
       <ScrollView contentContainerStyle={styles.stepContent}>
         <TextInput
           style={styles.textArea}
           multiline
-          placeholder="Type the text to synthesise…"
+          placeholder={placeholder}
           placeholderTextColor="#555"
           value={text}
           onChangeText={setText}
         />
-
-        <Text style={styles.sectionLabel}>Examples</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.chipsRow}
-        >
-          {EXAMPLES.map((ex, i) => (
-            <TouchableOpacity
-              key={i}
-              style={styles.chip}
-              onPress={() => setText(ex)}
-            >
-              <Text style={styles.chipText} numberOfLines={2}>
-                {ex}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
         <TouchableOpacity
           style={[
             styles.primaryButton,
@@ -65,7 +49,6 @@ export default function Write({
             {loading ? 'Generating…' : '✦  Generate Voice'}
           </Text>
         </TouchableOpacity>
-
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
       </ScrollView>
     </>
