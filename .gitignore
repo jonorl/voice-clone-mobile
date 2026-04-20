@@ -18,6 +18,7 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+
 # Metro
 .metro-health-check*
 
@@ -42,3 +43,6 @@ app-example
 # generated native folders
 /ios
 /android
+
+/.vscode
+*.vscode

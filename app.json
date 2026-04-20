@@ -5,10 +5,12 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "voiceclonemobile",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.voiceclonemobile"
     },
     "android": {
       "edgeToEdgeEnabled": true,
@@ -18,8 +20,6 @@
         "backgroundColor": "#000000"
       },
       "permissions": [
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ],

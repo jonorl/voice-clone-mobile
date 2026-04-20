@@ -12,6 +12,14 @@ A prebuilt APK for Android is available under Releases. Download and install it 
 
 ---
 
+## How to Install
+ 
+1. Go to the [Releases](https://github.com/jonorl/voice-clone-mobile/releases/tag/Android) page and download the latest `app-release.apk`
+2. Transfer the file to your Android device if downloaded on a computer
+3. On your device, open the APK file to install it — you may be prompted to allow installation from unknown sources, which can be enabled under **Settings → Security → Install unknown apps**
+4. Once installed, open **VoiceClone** from your app drawer
+> Requires Android 10 or higher.
+
 ## Key Features
 
 * **High-quality Spanish synthesis** using a fine-tuned XTTS v2 model
