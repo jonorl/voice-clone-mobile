@@ -1,50 +1,120 @@
-# Welcome to your Expo app 👋
+# Voice Clone Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Mobile companion to the [Voice Clone web project](https://github.com/jonorl/voice-clone) - AI-powered **Argentinean Spanish voice cloning** using **XTTS v2**, fine-tuned to replicate a specific voice profile with high naturalness and clarity.
 
-## Get started
+Built with **React Native** and **Expo 54**, this app connects to the same Hugging Face Space backend as the web version, providing a native mobile interface for speech synthesis on Android.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## Demo
 
-2. Start the app
+A prebuilt APK for Android is available under Releases. Download and install it directly on your device to try the app without building from source.
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## Key Features
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+* **High-quality Spanish synthesis** using a fine-tuned XTTS v2 model
+* **Near real-time generation** for short and medium-length texts
+* **Advanced controls** (temperature, top_p, top_k) to shape voice output
+* **Reproducible results** via deterministic seeding
+* **Native audio playback** with haptic feedback
+* **Share / Save** generated audio directly from the app
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## Related
 
-When you're ready, run:
+* **Web version**: [github.com/jonorl/voice-clone](https://github.com/jonorl/voice-clone)
+* **Live demo**: available via the Hugging Face Space linked in the web repo
+
+---
+
+## How It Works
+
+The app communicates with a Hugging Face Space running **Coqui XTTS v2**, fine-tuned on Spanish voice samples to reproduce a specific speaker's vocal characteristics, including intonation, rhythm, accent, and voice timbre. Speech is generated server-side and streamed back to the device as a WAV file.
+
+---
+
+## Synthesis Parameters
+
+| Parameter       | Range       | Description                                                                                              |
+| --------------- | ----------- | -------------------------------------------------------------------------------------------------------- |
+| **Temperature** | 0.1 – 1.0   | Controls randomness in speech prosody. Lower values sound more stable; higher values add expressiveness. |
+| **Top P**       | 0.1 – 1.0   | Nucleus sampling threshold. Lower values reduce diversity.                                               |
+| **Top K**       | 1 – 100     | Limits candidate tokens during generation.                                                               |
+| **Seed**        | Any integer | Ensures reproducible audio output when reused.                                                           |
+
+---
+
+## Tech Stack
+
+* **Framework**: React Native + Expo 54
+* **Audio**: expo-audio
+* **File system**: expo-file-system
+* **Haptics**: expo-haptics
+* **Sharing**: expo-sharing
+* **Model**: Coqui XTTS v2
+* **Backend**: Hugging Face Spaces (Gradio HTTP API)
+
+---
+
+## Building from Source
+
+### Prerequisites
+
+* Node.js 18+
+* Expo CLI (`npm install -g expo-cli`)
+* A Hugging Face token with access to the Space
+
+### Setup
 
 ```bash
-npm run reset-project
+git clone https://github.com/jonorl/voice-clone-mobile
+cd voice-clone-mobile
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Create a `.env` file in the root:
 
-## Learn more
+```
+EXPO_PUBLIC_HF_TOKEN=your_token_here
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### Run
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npx expo start
+```
 
-## Join the community
+### Build APK (via EAS)
 
-Join our community of developers creating universal apps.
+```bash
+npm install -g eas-cli
+eas login
+eas build -p android --profile preview
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+## Ethical Use Notice
+
+This project demonstrates voice cloning technology for **educational and experimental purposes only**. Ensure that you:
+
+* Have **explicit permission** to clone any individual's voice
+* Do **not** use generated audio for impersonation, fraud, or deception
+* Comply with all applicable laws and platform policies
+
+---
+
+## License
+
+This project uses **XTTS v2**, distributed under the **Coqui Public Model License**. Please review the license before commercial or large-scale usage.
+
+---
+
+## Acknowledgments
+
+* [Coqui TTS](https://github.com/coqui-ai/TTS) for XTTS v2
+* [Gradio](https://gradio.app/) for the backend interface
+* Hugging Face Spaces for hosting
