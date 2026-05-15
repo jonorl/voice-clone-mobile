@@ -4,9 +4,9 @@ import { styles } from '@/styles/shared'
 import { EXAMPLES } from '@/constants/examples';
 
 const LOADING_MESSAGES = [
-  'Analyzing text patterns...',
+  'Generating...',
   'Loading voice model...',
-  'Generating phonemes...',
+  'Creating phonemes...',
   'Waking Pedro up...',
   'Pedro is getting a coffee...',
   'Now brushing his teeth...',
