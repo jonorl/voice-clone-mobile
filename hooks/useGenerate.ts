@@ -5,11 +5,10 @@ import { AudioPlayer } from 'expo-audio';
 import { fetch } from 'expo/fetch';
 import generateSpeech, { checkSpace } from '../api/gradioClient';
 
-const HF_TOKEN = process.env.EXPO_PUBLIC_HF_TOKEN ?? '';
 type SpaceStatus = 'checking' | 'ready' | 'sleeping' | 'error';
 
 interface GenerateParams {
-  player?: AudioPlayer,
+  player?: AudioPlayer;
   text: string;
   temperature: number;
   topK: number;
@@ -26,7 +25,7 @@ export default function useGenerateSpeech(player: AudioPlayer, onSuccess: () => 
   useEffect(() => {
     const checkStatus = async () => {
       setSpaceStatus('checking');
-      const result = await checkSpace(HF_TOKEN);
+      const result = await checkSpace();
       setSpaceStatus(result);
     };
     checkStatus();
@@ -41,14 +40,15 @@ export default function useGenerateSpeech(player: AudioPlayer, onSuccess: () => 
     setAudioUri(null);
 
     try {
-      const rawUrl = await generateSpeech(
-        { text: params.text, temperature: params.temperature, top_p: params.topP, top_k: params.topK, seed: params.seed },
-        HF_TOKEN
-      );
-
-      const audioResponse = await fetch(rawUrl, {
-        headers: { Authorization: `Bearer ${HF_TOKEN}` },
+      const rawUrl = await generateSpeech({
+        text: params.text,
+        temperature: params.temperature,
+        top_p: params.topP,
+        top_k: params.topK,
+        seed: params.seed,
       });
+
+      const audioResponse = await fetch(rawUrl);
       if (!audioResponse.ok) throw new Error('Failed to fetch audio file');
 
       const outputFile = new File(Paths.cache, 'voice_clone_output.wav');
@@ -64,7 +64,7 @@ export default function useGenerateSpeech(player: AudioPlayer, onSuccess: () => 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
-      setSpaceStatus('sleeping');
+      setSpaceStatus('error');
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setLoading(false);

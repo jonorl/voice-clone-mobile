@@ -1,7 +1,20 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity } from 'react-native';
 import { styles } from '@/styles/shared'
 import { EXAMPLES } from '@/constants/examples';
+
+const LOADING_MESSAGES = [
+  'Analyzing text patterns...',
+  'Loading voice model...',
+  'Generating phonemes...',
+  'Waking Pedro up...',
+  'Pedro is getting a coffee...',
+  'Now brushing his teeth...',
+  'Gargling...',
+  'Almost there, clearing his throat...',
+  'Getting in front of the mic...',
+  'Rendering speech output...',
+];
 
 interface WriteProps {
   text: string;
@@ -25,6 +38,27 @@ export default function Write({
     () => EXAMPLES[Math.floor(Math.random() * EXAMPLES.length)],
     []
   );
+
+  const [msgIndex, setMsgIndex] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (loading) {
+      setMsgIndex(0);
+      intervalRef.current = setInterval(() => {
+        setMsgIndex(i => (i + 1) % LOADING_MESSAGES.length);
+      }, 2500);
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [loading]);
+
   return (
     <>
       <ScrollView contentContainerStyle={styles.stepContent}>
@@ -46,11 +80,11 @@ export default function Write({
           onPress={handleGenerate}
         >
           <Text style={styles.primaryButtonText}>
-            {loading ? 'Generating…' : '✦  Generate Voice'}
+            {loading ? LOADING_MESSAGES[msgIndex] : '✦  Generate Voice'}
           </Text>
         </TouchableOpacity>
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
       </ScrollView>
     </>
-  )
+  );
 }
