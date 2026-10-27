@@ -6,16 +6,20 @@
 [![Licence](https://img.shields.io/github/license/jonorl/voice-clone-mobile)](LICENSE)
 
 <p align="center">
-  <img src="docs/preview.gif" alt="Writing a Spanish sentence in the app and generating it: the app works on the cloned voice, then plays the result." width="300" />
+  <img src="docs/preview.gif" alt="Typing a Spanish sentence, lowering the temperature on the Tune step and generating: the app then switches to Listen and plays the result in the cloned voice." width="300" />
 </p>
 
 The Android app for [Voice Clone](https://github.com/jonorl/voice-clone). Type some Spanish and it is spoken in the voice of my friend Pedro, using a Coqui XTTS v2 model I fine-tuned on his voice messages. It uses the same model API as the [web demo](https://jonathan-orlowski.dev/voice-clone/).
 
 ## Install
 
-1. Download `app-release.apk` from the [latest release](https://github.com/jonorl/voice-clone-mobile/releases/latest).
-2. Open it on your phone. Android asks you to allow installs from that source the first time; it is under **Settings → Security → Install unknown apps**.
-3. Open **voice-clone-mobile** from the app drawer.
+1. Download `voice-clone-<version>.apk` from the [latest release](https://github.com/jonorl/voice-clone-mobile/releases/latest) on your phone.
+2. Open it. Android asks you to allow installs from that source the first time; it is under **Settings → Security → Install unknown apps**.
+3. Open **Voice Clone** from the app drawer.
+
+It needs Android 7.0 or later on an ARM phone, which is virtually every Android phone. Later releases install over it and keep it up to date.
+
+If you installed a release from before 2.0.0, it shows up as **voice-clone-mobile** and stays separate, because the app's ID changed in 2.0.0. Uninstall it.
 
 The app needs no permissions beyond internet access: it does not record audio, and it keeps the generated file in its own cache until you share it.
 
@@ -46,6 +50,7 @@ On start-up the app asks the API's `/health` endpoint whether the model is ready
 │   └── useAudioPlayback.ts # Playback through expo-audio
 ├── components/             # The three steps, the status pill and the sliders
 ├── constants/              # Colours and placeholder examples
+├── plugins/                # Expo config plugin that adds release signing
 └── styles/shared.ts        # Shared styles
 ```
 
@@ -68,7 +73,7 @@ The app calls the production model API, so nothing else needs to run. To build a
 
 ```bash
 npx expo prebuild --platform android
-cd android && ./gradlew assembleRelease
+cd android && ./gradlew assembleRelease -PreactNativeArchitectures=x86_64   # arm64-v8a for a phone
 adb install app/build/outputs/apk/release/app-release.apk
 ```
 
@@ -88,13 +93,37 @@ The Jest suite covers the API client (the health check, the request it sends, bo
 
 ## Security and maintenance
 
-- **CI:** the `Test` workflow runs on every push and pull request. It type-checks, lints and tests the app, and runs `expo-doctor`. The `Build APK` workflow, run by hand from the Actions tab, builds a release APK and keeps it as a downloadable artifact for 14 days. That APK is signed with a debug key, so it is for testing only.
+- **CI:** the `Test` workflow runs on every push and pull request. It type-checks, lints and tests the app, and runs `expo-doctor`. The `Build APK` workflow builds a signed APK; see [Releasing](#releasing).
 - **Branch ruleset:** changes to `main` go through a pull request with passing checks and no new high or critical CodeQL alerts. Force-pushes and deletion are blocked; repository admins can bypass.
 - **CodeQL:** scans the TypeScript and the workflows weekly and on every pull request.
 - **Permissions:** `app.json` blocks the microphone, shared storage and overlay permissions that Expo's template adds by default.
 - **Dependabot:** security updates as soon as an advisory appears, and version updates every Monday for npm and monthly for GitHub Actions. Expo, React Native and the native modules are held back, because each Expo SDK pins them; they move together with `npx expo install --fix` when the SDK is upgraded. [`.github/dependabot.yml`](.github/dependabot.yml) lists them.
 - **Override:** `package.json` forces zod 4 under `@expo/cli`, which still asks for zod 3, to pick up a security fix. The CLI only uses zod to validate dev-tools plugins, and those schemas work unchanged on zod 4. Remove the override once Expo moves to zod 4.
 - **Secret scanning** with push protection is on.
+
+## Releasing
+
+1. Bump `version` (shown to people) and `android.versionCode` (one more than the last release; Android refuses to install a lower one over a higher one) in `app.json`.
+2. Push to `main`, then push a matching tag:
+   ```bash
+   git tag v2.1.0 && git push origin v2.1.0
+   ```
+3. The `Build APK` workflow checks that the tag matches `app.json`, builds the APK, signs it and publishes a GitHub release with `voice-clone-<version>.apk` attached.
+
+Running `Build APK` by hand from the Actions tab builds the same signed APK and keeps it as a workflow artifact for 14 days instead of releasing it.
+
+### Signing
+
+Every APK is signed with one release key, so each release installs over the last. The key is not in the repository: the workflow reads it from four repository secrets, and [`plugins/withReleaseSigning.js`](plugins/withReleaseSigning.js) adds it to the generated Gradle project. Without them, a local release build falls back to the debug key, which installs on an emulator but not over a real release.
+
+| Secret                      | Holds                                  |
+| --------------------------- | -------------------------------------- |
+| `ANDROID_KEYSTORE_BASE64`   | The keystore file, base64-encoded      |
+| `ANDROID_KEYSTORE_PASSWORD` | The keystore's password                |
+| `ANDROID_KEY_ALIAS`         | The key's alias in it (`voice-clone`)  |
+| `ANDROID_KEY_PASSWORD`      | The key's password                     |
+
+If the key is lost, later APKs cannot install over the ones already out there, and everyone would have to uninstall and reinstall. Keep a backup of it outside GitHub.
 
 ## Ethical use
 
