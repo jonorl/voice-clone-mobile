@@ -45,5 +45,10 @@
   "private": true,
   "jest": {
     "preset": "jest-expo"
+  },
+  "overrides": {
+    "@expo/cli": {
+      "zod": "^4.6.7"
+    }
   }
 }

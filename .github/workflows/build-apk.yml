@@ -1,0 +1,48 @@
+name: Build APK
+
+# Run by hand (Actions → Build APK → Run workflow) rather than on every push: the native build takes several minutes,
+# and it only needs proving before a release or after an Expo upgrade.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install
+        run: npm ci
+
+      - name: Generate the native project
+        run: npx expo prebuild --platform android --no-install
+
+      # Builds the release APK to prove the native side still compiles. It is signed with the debug key from the
+      # generated project, so it is for testing, not for publishing.
+      - name: Build
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: app-release
+          path: android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 14

@@ -88,11 +88,12 @@ The Jest suite covers the API client (the health check, the request it sends, bo
 
 ## Security and maintenance
 
-- **CI:** the `Test` workflow runs on every push and pull request. It type-checks, lints and tests the app, runs `expo-doctor`, and builds a release APK, which it keeps as a downloadable artifact for 14 days. That APK is signed with a debug key, so it is for testing only.
+- **CI:** the `Test` workflow runs on every push and pull request. It type-checks, lints and tests the app, and runs `expo-doctor`. The `Build APK` workflow, run by hand from the Actions tab, builds a release APK and keeps it as a downloadable artifact for 14 days. That APK is signed with a debug key, so it is for testing only.
 - **Branch ruleset:** changes to `main` go through a pull request with passing checks and no new high or critical CodeQL alerts. Force-pushes and deletion are blocked; repository admins can bypass.
 - **CodeQL:** scans the TypeScript and the workflows weekly and on every pull request.
 - **Permissions:** `app.json` blocks the microphone, shared storage and overlay permissions that Expo's template adds by default.
 - **Dependabot:** security updates as soon as an advisory appears, and version updates every Monday for npm and monthly for GitHub Actions. Expo, React Native and the native modules are held back, because each Expo SDK pins them; they move together with `npx expo install --fix` when the SDK is upgraded. [`.github/dependabot.yml`](.github/dependabot.yml) lists them.
+- **Override:** `package.json` forces zod 4 under `@expo/cli`, which still asks for zod 3, to pick up a security fix. The CLI only uses zod to validate dev-tools plugins, and those schemas work unchanged on zod 4. Remove the override once Expo moves to zod 4.
 - **Secret scanning** with push protection is on.
 
 ## Ethical use
