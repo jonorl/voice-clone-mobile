@@ -30,7 +30,12 @@ export default function WaveformOrb({ active }: { active: boolean }) {
   }, [active, scale]);
 
   return (
-    <Animated.View style={[styles.orb, { transform: [{ scale }] }]}>
+    // Purely decorative, so screen readers skip it.
+    <Animated.View
+      style={[styles.orb, { transform: [{ scale }] }]}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+    >
       <View style={styles.orbInner} />
     </Animated.View>
   );

@@ -102,3 +102,34 @@ describe('StatusPill', () => {
     expect(screen.getByText(label)).toBeTruthy();
   });
 });
+
+describe('accessibility', () => {
+  it('labels the text box and announces errors', async () => {
+    await render(<Write {...writeProps} error="Please keep the text under 1000 characters." />);
+
+    expect(screen.getByLabelText('Spanish text to speak')).toBeTruthy();
+    expect(screen.getByRole('alert')).toHaveTextContent('Please keep the text under 1000 characters.');
+  });
+
+  it('marks Generate as a busy button while generating', async () => {
+    await render(<Write {...writeProps} loading />);
+
+    const button = screen.getByRole('button');
+    expect(button).toBeBusy();
+    expect(button).toBeDisabled();
+  });
+
+  it('names each slider and shows whole numbers without decimals', async () => {
+    await render(<Tune {...tuneProps} />);
+
+    expect(screen.getByLabelText('Temperature')).toHaveAccessibilityValue({ text: '0.70' });
+    expect(screen.getByLabelText('Top-K')).toHaveAccessibilityValue({ text: '50' });
+    expect(screen.getByText('42')).toBeTruthy();
+  });
+
+  it('reads the server status as words', async () => {
+    await render(<StatusPill spaceStatus="ready" />);
+
+    expect(screen.getByLabelText('Server status: Ready')).toBeTruthy();
+  });
+});

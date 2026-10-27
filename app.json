@@ -7,10 +7,6 @@
     "scheme": "voiceclonemobile",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.voiceclonemobile"
-    },
     "android": {
       "predictiveBackGestureEnabled": false,
       "adaptiveIcon": {
@@ -40,6 +36,9 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "platforms": [
+      "android"
+    ]
   }
 }

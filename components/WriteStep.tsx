@@ -48,6 +48,8 @@ export default function Write({
           value={text}
           onChangeText={setText}
           maxLength={1000}
+          accessibilityLabel="Spanish text to speak"
+          accessibilityHint="Up to 1,000 characters"
         />
         <TouchableOpacity
           style={[
@@ -57,12 +59,19 @@ export default function Write({
           ]}
           disabled={!text.trim() || loading || spaceStatus !== 'ready'}
           onPress={handleGenerate}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !text.trim() || loading || spaceStatus !== 'ready', busy: loading }}
         >
           <Text style={styles.primaryButtonText}>
             {loading ? <LoadingMessage /> : '✦  Generate Voice'}
           </Text>
         </TouchableOpacity>
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {/* Announced as it appears, since it shows up minutes after the button was pressed. */}
+        {error ? (
+          <Text style={styles.errorText} accessibilityRole="alert" accessibilityLiveRegion="polite">
+            {error}
+          </Text>
+        ) : null}
       </ScrollView>
     </>
   );

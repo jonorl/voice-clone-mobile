@@ -46,18 +46,19 @@ export default function StepTabs({
     if (!audioUri) return;
     await Sharing.shareAsync(audioUri, {
       mimeType: 'audio/wav',
-      UTI: 'public.audio',
     });
   };
 
   return (
     <>
-      <View style={styles.tabs}>
+      <View style={styles.tabs} accessibilityRole="tablist">
         {(['write', 'tune', 'listen'] as Step[]).map((s) => (
           <TouchableOpacity
             key={s}
             style={[styles.tab, step === s && styles.tabActive]}
             onPress={() => setStep(s)}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: step === s }}
           >
             <Text style={[styles.tabText, step === s && styles.tabTextActive]}>
               {s.charAt(0).toUpperCase() + s.slice(1)}

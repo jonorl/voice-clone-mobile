@@ -34,12 +34,15 @@ export default function Listen({
           ]}
           onPress={() => togglePlayback(audioUri)}
           disabled={!audioUri}
+          accessibilityRole="button"
+          accessibilityLabel={playing ? 'Pause' : 'Play'}
+          accessibilityState={{ disabled: !audioUri }}
         >
           <Text style={styles.playButtonText}>{playing ? '⏸' : '▶'}</Text>
         </TouchableOpacity>
 
         {audioUri && (
-          <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
+          <TouchableOpacity style={styles.shareButton} onPress={handleShare} accessibilityRole="button">
             <Text style={styles.shareButtonText}>Share / Save</Text>
           </TouchableOpacity>
         )}
