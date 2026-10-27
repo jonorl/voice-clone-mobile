@@ -1,9 +1,9 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Animated, Easing } from 'react-native';
 import { styles } from '@/styles/shared';
 
 export default function WaveformOrb({ active }: { active: boolean }) {
-  const scale = useRef(new Animated.Value(1)).current;
+  const [scale] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     if (active) {
@@ -27,7 +27,7 @@ export default function WaveformOrb({ active }: { active: boolean }) {
       scale.stopAnimation();
       Animated.spring(scale, { toValue: 1, useNativeDriver: true }).start();
     }
-  }, [active]);
+  }, [active, scale]);
 
   return (
     <Animated.View style={[styles.orb, { transform: [{ scale }] }]}>

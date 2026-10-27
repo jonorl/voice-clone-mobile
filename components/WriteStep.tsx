@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity } from 'react-native';
 import { styles } from '@/styles/shared'
 import { EXAMPLES } from '@/constants/examples';
@@ -34,30 +34,8 @@ export default function Write({
   error
 }: WriteProps) {
 
-  const placeholder = useMemo(
-    () => EXAMPLES[Math.floor(Math.random() * EXAMPLES.length)],
-    []
-  );
-
-  const [msgIndex, setMsgIndex] = useState(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => {
-    if (loading) {
-      setMsgIndex(0);
-      intervalRef.current = setInterval(() => {
-        setMsgIndex(i => (i + 1) % LOADING_MESSAGES.length);
-      }, 2500);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [loading]);
+  // Picked once per mount, so the placeholder does not change while typing.
+  const [placeholder] = useState(() => EXAMPLES[Math.floor(Math.random() * EXAMPLES.length)]);
 
   return (
     <>
@@ -69,6 +47,7 @@ export default function Write({
           placeholderTextColor="#555"
           value={text}
           onChangeText={setText}
+          maxLength={1000}
         />
         <TouchableOpacity
           style={[
@@ -80,11 +59,23 @@ export default function Write({
           onPress={handleGenerate}
         >
           <Text style={styles.primaryButtonText}>
-            {loading ? LOADING_MESSAGES[msgIndex] : '✦  Generate Voice'}
+            {loading ? <LoadingMessage /> : '✦  Generate Voice'}
           </Text>
         </TouchableOpacity>
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
       </ScrollView>
     </>
   );
+}
+
+// Mounted only while generating, so each run starts from the first message.
+function LoadingMessage() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => setIndex(i => (i + 1) % LOADING_MESSAGES.length), 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  return <>{LOADING_MESSAGES[index]}</>;
 }

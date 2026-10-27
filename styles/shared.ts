@@ -21,7 +21,6 @@ export const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   statusPillReady: { borderColor: '#2d6a2d' },
-  statusPillSleeping: { borderColor: '#7a6a1a' },
   statusPillError: { borderColor: '#6a2d2d' },
   statusPillText: { fontSize: 11, color: colors.muted },
   tabs: {

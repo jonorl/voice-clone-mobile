@@ -35,12 +35,13 @@ export default function Tune({
   return (
     <>
       <ScrollView contentContainerStyle={styles.stepContent}>
+        {/* The ranges match the server's sliders, which reject anything outside them. */}
         <Text style={styles.sectionLabel}>Generation Parameters</Text>
         <ParamRow
           label="Temperature"
           value={temperature}
           min={0.1}
-          max={1.5}
+          max={1}
           step={0.05}
           onChange={setTemperature}
         />
@@ -48,7 +49,7 @@ export default function Tune({
           label="Top-K"
           value={topK}
           min={1}
-          max={200}
+          max={100}
           step={1}
           onChange={setTopK}
         />
@@ -75,7 +76,7 @@ export default function Tune({
             styles.primaryButtonDisabled,
           ]}
           disabled={!text.trim() || loading || spaceStatus !== 'ready'}
-          onPress={() => { () => handleGenerate }}
+          onPress={handleGenerate}
         >
           <Text style={styles.primaryButtonText}>
             {loading ? 'Generating…' : '✦  Generate with these params'}

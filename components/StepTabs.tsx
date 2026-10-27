@@ -5,9 +5,9 @@ import * as Sharing from 'expo-sharing';
 import Write from './WriteStep';
 import Tune from './TuneStep';
 import Listen from './ListenStep';
+import type { SpaceStatus } from '@/api/gradioClient';
 
 type Step = 'write' | 'tune' | 'listen';
-type SpaceStatus = 'checking' | 'ready' | 'sleeping' | 'error';
 
 interface StepTabsProps {
   step: Step;

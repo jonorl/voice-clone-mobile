@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { styles } from '@/styles/shared'
 
-type SpaceStatus = 'checking' | 'ready' | 'sleeping' | 'error';
+import type { SpaceStatus } from '@/api/gradioClient';
 
 interface StatusPillProps {
   spaceStatus: SpaceStatus;
@@ -17,7 +17,6 @@ export default function StatusPill({ spaceStatus }: StatusPillProps) {
           style={[
             styles.statusPill,
             spaceStatus === 'ready' && styles.statusPillReady,
-            spaceStatus === 'sleeping' && styles.statusPillSleeping,
             spaceStatus === 'error' && styles.statusPillError,
           ]}
         >
@@ -26,9 +25,7 @@ export default function StatusPill({ spaceStatus }: StatusPillProps) {
               ? '● Ready'
               : spaceStatus === 'checking'
                 ? '◌ Checking…'
-                : spaceStatus === 'sleeping'
-                  ? '○ Sleeping'
-                  : '✕ Error'}
+                : '✕ Error'}
           </Text>
         </View>
       </View>

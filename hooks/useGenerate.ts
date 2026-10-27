@@ -3,9 +3,7 @@ import * as Haptics from 'expo-haptics';
 import { File, Paths } from 'expo-file-system';
 import { AudioPlayer } from 'expo-audio';
 import { fetch } from 'expo/fetch';
-import generateSpeech, { checkSpace } from '../api/gradioClient';
-
-type SpaceStatus = 'checking' | 'ready' | 'sleeping' | 'error';
+import generateSpeech, { checkSpace, type SpaceStatus } from '../api/gradioClient';
 
 interface GenerateParams {
   player?: AudioPlayer;
@@ -64,7 +62,9 @@ export default function useGenerateSpeech(player: AudioPlayer, onSuccess: () => 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
-      setSpaceStatus('error');
+      // A refused or failed request does not mean the server is down, and marking it so would keep Generate
+      // disabled until the app restarts; ask the server instead.
+      setSpaceStatus(await checkSpace());
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setLoading(false);

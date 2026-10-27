@@ -4,13 +4,16 @@
 const SPACE_BASE = 'https://voice.jonathan-orlowski.dev';
 const ENDPOINT   = '/generate_speech';
 
-export type SpaceStatus = 'checking' | 'ready' | 'sleeping' | 'error';
+export type SpaceStatus = 'checking' | 'ready' | 'error';
 
-// ── Check if the server is reachable ─────────────────────────────────────────
+// ── Check if the server can generate ──────────────────────────────────────────
+// /health answers 503 when the server is up but the model files are missing, so a reachable server is not enough.
 export async function checkSpace(): Promise<SpaceStatus> {
   try {
-    const res = await fetch(`${SPACE_BASE}/gradio_api/info`);
-    return res.ok ? 'ready' : 'error';
+    const res = await fetch(`${SPACE_BASE}/health`);
+    if (!res.ok) return 'error';
+    const body = (await res.json()) as { status?: string };
+    return body.status === 'ok' ? 'ready' : 'error';
   } catch {
     return 'error';
   }
@@ -45,10 +48,7 @@ export default async function generateSpeech(
     }),
   });
 
-  if (!postRes.ok) {
-    const err = await postRes.text();
-    throw new Error(`Queue POST failed (${postRes.status}): ${err}`);
-  }
+  if (!postRes.ok) throw new Error(`The server could not take the request (${postRes.status})`);
 
   const { event_id } = await postRes.json() as { event_id: string };
   if (!event_id) throw new Error('No event_id returned from Gradio');
@@ -60,7 +60,7 @@ export default async function generateSpeech(
     `${SPACE_BASE}/gradio_api/call${ENDPOINT}/${event_id}`,
   );
 
-  if (!sseRes.ok) throw new Error(`SSE GET failed (${sseRes.status})`);
+  if (!sseRes.ok) throw new Error(`The server stopped responding (${sseRes.status})`);
 
   const audioUrl = await parseSSEForAudioUrl(sseRes);
   return audioUrl;
@@ -82,27 +82,33 @@ async function parseSSEForAudioUrl(response: Response): Promise<string> {
       lastEventType = line.slice('event: '.length).trim();
     } else if (line.startsWith('data: ') && lastEventType === 'complete') {
       const raw = line.slice('data: '.length).trim();
+      let parsed: unknown;
       try {
-        const parsed = JSON.parse(raw);
-        // Gradio returns an array; the audio output is the first element.
-        // It's either { url: "..." } or a plain string URL.
-        const first = Array.isArray(parsed) ? parsed[0] : parsed;
-        const url: string | undefined =
-          first?.url ?? (typeof first === 'string' ? first : undefined);
-
-        if (!url) throw new Error('No URL found in Gradio response');
-
-        // Self-hosted Gradio often returns a root-relative path like
-        // /gradio_api/file=tmp1234.wav — resolve it against SPACE_BASE.
-        return url.startsWith('http') ? url : `${SPACE_BASE}${url}`;
-      } catch (e) {
-        throw new Error(`Failed to parse Gradio response: ${raw} — ${e}`);
+        parsed = JSON.parse(raw);
+      } catch {
+        throw new Error('The server sent a response the app could not read');
       }
+      // Gradio returns [audio, status]. The audio is { url } or a plain URL; when the server refuses the request
+      // (empty or overlong text) the audio is null and the status says why.
+      const [first, status] = Array.isArray(parsed) ? parsed : [parsed];
+      const url: string | undefined =
+        (first as { url?: string } | null)?.url ?? (typeof first === 'string' ? first : undefined);
+
+      if (!url) throw new Error(typeof status === 'string' && status ? status : 'The server returned no audio');
+
+      // Self-hosted Gradio often returns a root-relative path like
+      // /gradio_api/file=tmp1234.wav — resolve it against SPACE_BASE.
+      return url.startsWith('http') ? url : `${SPACE_BASE}${url}`;
     } else if (line.startsWith('data: ') && lastEventType === 'error') {
+      // Gradio's own validation (e.g. a slider value out of range) arrives as { error: "..." }.
       const raw = line.slice('data: '.length).trim();
-      throw new Error(`Gradio returned an error: ${raw}`);
+      let message = 'The server could not generate the audio';
+      try {
+        message = (JSON.parse(raw) as { error?: string } | null)?.error || message;
+      } catch {}
+      throw new Error(message);
     }
   }
 
-  throw new Error('No complete event found in Gradio SSE response');
+  throw new Error('The server closed the connection before the audio was ready');
 }

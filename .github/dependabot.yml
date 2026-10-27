@@ -1,0 +1,49 @@
+version: 2
+
+# Minor and patch bumps arrive as one PR so the weekly run stays reviewable; majors come separately because they are
+# the ones that break things.
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: America/Argentina/Buenos_Aires
+    groups:
+      minor-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Each Expo SDK pins the versions of React, React Native and the native modules it was built against, so these
+      # move together with `npx expo install --fix` when the SDK is upgraded, never one by one.
+      - dependency-name: "expo"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "expo-*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "@expo/*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "jest-expo"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "eslint-config-expo"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "react"
+      - dependency-name: "react-native"
+      - dependency-name: "react-native-*"
+      - dependency-name: "@react-native-community/*"
+      - dependency-name: "@types/react"
+      - dependency-name: "typescript"
+      - dependency-name: "jest"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "@types/jest"
+        update-types: ["version-update:semver-major"]
+      # eslint-config-expo supports ESLint 9 only.
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]

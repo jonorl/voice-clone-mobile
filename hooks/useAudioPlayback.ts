@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import * as Haptics from 'expo-haptics';
 
@@ -18,7 +18,7 @@ export default function useAudioPlayback() {
     if (status.didJustFinish) {
       player.seekTo(0);
     }
-  }, [status.didJustFinish]);
+  }, [status.didJustFinish, player]);
 
   const togglePlayback = useCallback((audioUri: string | null) => {
     if (!audioUri) return;
