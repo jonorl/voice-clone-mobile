@@ -26,6 +26,8 @@ updates:
       - dependency-name: "eslint-config-expo"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
       - dependency-name: "react"
+      # Must match react exactly; bumped alone it breaks npm ci on the peer dependency.
+      - dependency-name: "react-dom"
       - dependency-name: "react-native"
       - dependency-name: "react-native-*"
       - dependency-name: "@react-native-community/*"
